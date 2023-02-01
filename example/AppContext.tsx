@@ -71,10 +71,10 @@ class AppContextProvider extends React.Component<{}, AppContextState> {
     }
 
     componentDidMount() {
-        remote.on("remoteConnected", this.onConnected)
-            .on("remoteDisconnected", this.onDisconnected)
-            .on("playerStateChanged", this.onPlayerStateChanged)
-            .on("playerContextChanged", this.onPlayerContextChanged);
+        remote.addListener("remoteConnected", this.onConnected);
+        remote.addListener("remoteDisconnected", this.onDisconnected);
+        remote.addListener("playerStateChanged", this.onPlayerStateChanged);
+        remote.addListener("playerContextChanged", this.onPlayerContextChanged);
 
         auth.getSession().then((session) => {
             if (session != undefined && session.accessToken != undefined) {

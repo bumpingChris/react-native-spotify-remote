@@ -153,16 +153,24 @@ app.post('/swap', async (req, res) => {
  * Uses the refresh token on request body to get a new access token
  */
 app.post('/refresh', async (req, res) => {
-	console.log("REFRESH");
+	// console.log("REFRESH 1", req);
+	const obj = JSON.parse(JSON.stringify(req.body));
+	const objKey = Object.keys(obj)[0];
+	// console.log("REFRESH 2", objKey);
+	// console.log("REFRESH 3", JSON.parse(objKey).refresh_token);
+	const refreshTokenEncrypted = JSON.parse(objKey).refresh_token;
 	try {
 		// ensure refresh token parameter
-		if (!req.body.refresh_token) {
+		//if (!req.body.refresh_token) {
+		if (!refreshTokenEncrypted) {
 			res.status(400).json({error: 'Refresh token is missing from body'});
 			return;
 		}
 
+		console.log('About to decrypt token', refreshTokenEncrypted);
 		// decrypt token
-		const refreshToken = decrypt(req.body.refresh_token);
+		// const refreshToken = decrypt(req.body.refresh_token);
+		const refreshToken = decrypt(refreshTokenEncrypted);
 		// build request data
 		const reqData = {
 			grant_type: 'refresh_token',
@@ -170,6 +178,8 @@ app.post('/refresh', async (req, res) => {
 		};
 		// get new token from Spotify API
 		const { response, result } = await postRequest(spotifyEndpoint, reqData);
+
+		console.log('Response from postRequest', result);
 
 		// encrypt refresh_token
 		if (result.refresh_token) {
